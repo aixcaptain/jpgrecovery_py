@@ -1,8 +1,12 @@
 import os, sys, binascii
 global sector #섹터 위치 저장
-
+global count
+count = 0
 def recovery(imagefile) :
+
     global sector
+    global count
+
     status = os.stat(imagefile)
     filesize = status.st_size 
     print(imagefile,"의 크기 : ",filesize/(1024*1024),"Mb") #조사할려는 이미지의 크기 출력
@@ -21,13 +25,15 @@ def recovery(imagefile) :
 
 def read_disk(f) :
     global sector
+    global count
     sub_sector = read_file(f)
     sector_hex = binascii.hexlify(sub_sector) #읽은 섹터의 바이너리 값을 헥스 값으로 변환
     findfooter = False #이미지의 끝을 찾앗나 체크
 
     if sector_hex[:8] == 'ffd8ffe0' : #JPG의 헤더는 FFD8FFE0이다 찾았다면 쓰기 시작
         prinf("이미지 파일 발견")
-        jpgfile = open("recovery/"+str(sector)+".jpg","wb")
+        count = count + 1
+        jpgfile = open("recovery/"+str(count)+".jpg","wb")
         jpgfile.write(sub_sector)
 
         while findfooter == False : #이미지의 끝을 찾을때까지 쓰기
